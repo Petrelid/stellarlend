@@ -1,0 +1,35 @@
+# Deterministic Soroban local network for contract tests.
+# The account secrets are test-only values loaded from accounts.env.
+
+services:
+  soroban:
+    image: stellar/quickstart:latest
+    command: --local --enable-soroban-rpc
+    ports:
+      - "${SOROBAN_RPC_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8000/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - soroban_data:/opt/stellar
+
+  accounts:
+    image: stellar/quickstart:latest
+    entrypoint: ["/bin/bash", "/scripts/init-accounts.sh"]
+    env_file:
+      - ./accounts.env
+    environment:
+      FRIENDBOT_URL: http://soroban:8000/friendbot
+    volumes:
+      - ./init-accounts.sh:/scripts/init-accounts.sh:ro
+      - accounts_data:/root/.config/stellar
+    depends_on:
+      soroban:
+        condition: service_healthy
+    restart: "no"
+
+volumes:
+  soroban_data:
+  accounts_data:

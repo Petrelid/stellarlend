@@ -67,6 +67,21 @@ Environment overrides: `DEVNET_RPC_URL`, `DEVNET_FRIENDBOT_URL`, `DEVNET_PASSPHR
 `DEVNET_CONTAINER`, `DEVNET_KEY_PREFIX`, `DEVNET_STATE_DIR`, `DEVNET_WASM`,
 `DEVNET_HEALTH_TIMEOUT`.
 
+### Deterministic Docker local-net
+
+For repeatable contract and integration tests, use the minimal Soroban-only
+compose environment:
+
+```bash
+just local-net
+just docker-config
+```
+
+`docker/local-net/accounts.env` contains local-only test keys for `admin`,
+`alice`, and `bob`. The accounts service imports those keys and funds them
+through friendbot after the node health check passes. Never reuse these keys
+outside the local network.
+
 ## Faucet
 
 Fund any number of accounts with XLM and devnet USDC in one command, against the
